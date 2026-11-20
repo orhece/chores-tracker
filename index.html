@@ -21,25 +21,36 @@
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { margin:0; background:var(--bg); color:var(--text); font:17px -apple-system, system-ui, sans-serif; }
   body { padding:env(safe-area-inset-top) 0 calc(60px + env(safe-area-inset-bottom)); -webkit-text-size-adjust:100%; }
-  header { display:flex; align-items:flex-end; justify-content:space-between; padding:12px 16px 4px; }
+  header { display:flex; align-items:flex-end; justify-content:space-between; padding:12px 16px 4px; min-height:56px; }
   h1 { font-size:34px; margin:0; }
   .hsub { color:var(--sub); font-size:15px; padding:0 16px 8px; }
   button { font:inherit; color:var(--accent); background:none; border:0; padding:8px; cursor:pointer; }
   h2 { font-size:22px; margin:20px 16px 6px; text-transform:capitalize; }
+  h2 .count { color:var(--sub); font-weight:400; }
   h3 { font-size:13px; font-weight:400; color:var(--sub); text-transform:uppercase; margin:12px 16px 6px; }
-  ul { list-style:none; margin:0 16px; padding:0; background:var(--card); border-radius:10px; overflow:hidden; }
-  li { display:flex; align-items:center; min-height:52px; padding:6px 0 6px 12px; }
-  li + li { position:relative; }
-  li + li::before { content:""; position:absolute; top:0; left:48px; right:0; border-top:0.5px solid var(--line); }
+  ul { list-style:none; margin:0 16px; padding:0; background:var(--card); border-radius:10px; overflow:hidden; min-height:44px; }
+  li { display:flex; align-items:center; min-height:52px; padding:6px 0 6px 12px; position:relative; }
+  li + li::before { content:""; position:absolute; top:0; left:12px; right:0; border-top:0.5px solid var(--line); }
+  li.has-check + li::before { left:48px; }
+  li.ph { color:var(--sub); font-size:15px; justify-content:center; padding-right:12px; }
   .check { flex:none; width:24px; height:24px; border-radius:50%; border:1.5px solid var(--line); margin-right:12px; padding:0; }
   .check.on { background:var(--accent); border-color:var(--accent); box-shadow:inset 0 0 0 3px var(--card); }
-  .body { flex:1; min-width:0; padding-right:12px; }
+  .body { flex:1; min-width:0; padding-right:8px; }
   .name { text-transform:lowercase; }
   .meta { color:var(--sub); font-size:14px; margin-top:2px; }
   .late { color:var(--red); }
   .skip { font-size:15px; flex:none; margin-right:4px; }
+  select { font:inherit; font-size:15px; color:var(--accent); background:none; border:0; flex:none; padding:8px 4px; -webkit-appearance:none; appearance:none; }
+  .grip { flex:none; width:44px; align-self:stretch; display:flex; align-items:center; justify-content:center; color:var(--sub); font-size:20px; touch-action:none; -webkit-user-select:none; user-select:none; cursor:grab; }
+  .dragging { opacity:.3; }
+  .ghost { position:fixed; left:16px; right:16px; z-index:30; background:var(--card); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.25); pointer-events:none; }
+  .ghost::before { display:none; }
+  ul.target { outline:2px solid var(--accent); }
+  .drop-line { height:3px; background:var(--accent); margin:0 12px; border-radius:2px; }
+  body.is-dragging { -webkit-user-select:none; user-select:none; }
   .empty { color:var(--sub); text-align:center; padding:48px 16px; }
-  nav { position:fixed; left:0; right:0; bottom:0; display:flex; background:var(--card); border-top:0.5px solid var(--line); padding-bottom:env(safe-area-inset-bottom); }
+  .section { font-size:28px; margin:32px 16px 0; }
+  nav { position:fixed; left:0; right:0; bottom:0; display:flex; background:var(--card); border-top:0.5px solid var(--line); padding-bottom:env(safe-area-inset-bottom); z-index:5; }
   nav button { flex:1; padding:10px 0 8px; color:var(--sub); font-size:12px; position:relative; }
   nav button.on { color:var(--accent); font-weight:600; }
   .badge { display:inline-block; min-width:18px; padding:0 5px; border-radius:9px; background:var(--red); color:#fff; font-size:12px; margin-left:4px; }
@@ -50,6 +61,7 @@
   label { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:46px; padding:0 12px; background:var(--card); }
   label + label { border-top:0.5px solid var(--line); }
   input { font:inherit; color:var(--text); background:none; border:0; text-align:right; flex:1; min-width:0; font-size:17px; }
+  label select { font-size:17px; color:var(--sub); text-align:right; }
   input:focus { outline:none; }
   .group { margin:16px; border-radius:10px; overflow:hidden; }
   .group button { display:block; width:100%; text-align:left; padding:12px; background:var(--card); }
@@ -79,7 +91,7 @@
     <label>Chore <input id="e-name" autocomplete="off" placeholder="name"></label>
     <label>Room <input id="e-room" autocomplete="off" list="rooms" placeholder="room"></label>
     <label>Every _ weeks <input id="e-every" type="number" inputmode="numeric" min="1"></label>
-    <label>Minutes <input id="e-min" type="number" inputmode="numeric" min="0"></label>
+    <label>Time <select id="e-min"><option value="3">3 min</option><option value="5">5 min</option><option value="10">10 min</option></select></label>
     <label>Next due <input id="e-due" type="date"></label>
   </div>
   <p class="note" id="e-last"></p>
@@ -105,15 +117,21 @@
   const $ = id => document.getElementById(id);
   const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MINUTES = [3, 5, 10];
+  const BUCKETS = [1, 2, 4];          // frequency buckets always shown in each room (weeks)
+  const IMPORT_START_WEEKDAY = 3;     // TESTING: a fresh chores file is scheduled from the most recent Wednesday (0 = Sun … 6 = Sat)
 
   // ---- dates: stored as "YYYY-MM-DD", math done on whole days ----
   const pad = n => String(n).padStart(2, '0');
   const toDay = s => { const [y,m,d] = s.split('-').map(Number); return Date.UTC(y, m-1, d) / 864e5; };
   const fromDay = n => { const d = new Date(n * 864e5); return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`; };
   const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+  const dow = s => new Date(toDay(s) * 864e5).getUTCDay();
   const pretty = s => { const d = new Date(toDay(s) * 864e5); return `${DAYS[d.getUTCDay()]}, ${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`; };
-  const weekday = s => DAYS[new Date(toDay(s) * 864e5).getUTCDay()];
+  const weekday = s => DAYS[dow(s)];
+  const addDays = (s, n) => fromDay(toDay(s) + n);
   const freqLabel = n => n == 1 ? 'Weekly' : `Every ${n} weeks`;
+  const snapMin = m => (m = +m || 5) <= 3 ? 3 : m <= 7 ? 5 : 10;
 
   // first scheduled date strictly after `after` (keeps the chore on its weekday rhythm)
   const nextAfter = (c, after) => {
@@ -124,15 +142,21 @@
 
   // ---- storage ----
   let state = load();
-  function load() { try { return JSON.parse(localStorage.getItem(KEY)) || { chores: [] }; } catch { return { chores: [] }; } }
+  function load() {
+    let s; try { s = JSON.parse(localStorage.getItem(KEY)); } catch {}
+    s = s && Array.isArray(s.chores) ? s : { chores: [] };
+    s.chores.forEach((c, i) => { c.minutes = snapMin(c.minutes); if (c.order == null) c.order = i; });
+    return s;
+  }
   function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
   const uid = () => Math.random().toString(36).slice(2, 10);
+  const find = id => state.chores.find(x => x.id === id);
 
   // ---- actions ----
   let undo = null, toastTimer = null;
   function complete(id) {
-    const c = state.chores.find(x => x.id === id); if (!c) return;
+    const c = find(id); if (!c) return;
     const t = todayStr();
     const before = { due: c.due, log: c.log.slice() };
     c.log.unshift({ done: t, due: c.due }); c.log = c.log.slice(0, 50);
@@ -141,13 +165,14 @@
     toast(`Done · next ${pretty(c.due)}`, () => { c.due = before.due; c.log = before.log; save(); render(); });
   }
   function skip(id) {
-    const c = state.chores.find(x => x.id === id); if (!c) return;
+    const c = find(id); if (!c) return;
     const before = c.due;
     c.due = nextAfter(c, todayStr()); save(); render();
     toast(`Skipped · next ${pretty(c.due)}`, () => { c.due = before; save(); render(); });
   }
   function toast(msg, fn) {
     undo = fn; $('toast-msg').textContent = msg; $('toast').style.display = 'flex';
+    $('toast-undo').style.display = fn ? '' : 'none';
     clearTimeout(toastTimer); toastTimer = setTimeout(() => { $('toast').style.display = 'none'; undo = null; }, 5000);
   }
   $('toast-undo').onclick = () => { if (undo) undo(); undo = null; $('toast').style.display = 'none'; };
@@ -157,24 +182,25 @@
   const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
   const roomSort = (a, b) => (a === 'misc') - (b === 'misc') || a.localeCompare(b);
   const groupBy = (arr, f) => arr.reduce((m, x) => ((m[f(x)] ||= []).push(x), m), {});
-  const n = (k, w) => `${k} ${w}${k === 1 ? '' : 's'}`;
   const mins = list => list.reduce((s, c) => s + (+c.minutes || 0), 0);
+  const n = (k, w) => `${k} ${w}${k === 1 ? '' : 's'}`;
+  const byName = (a, b) => a.room.localeCompare(b.room) || a.name.localeCompare(b.name);
 
-  function row(c, mode) {
-    const t = todayStr();
-    let meta;
-    if (mode === 'all') {
-      const late = c.due < t;
-      meta = `${weekday(c.due)} · ${c.minutes} min · <span class="${late ? 'late' : ''}">${c.due === t ? 'due today' : (late ? 'past due ' : 'next ') + pretty(c.due)}</span>`;
-    } else if (mode === 'today') {
-      meta = `${freqLabel(c.every).toLowerCase()} · ${c.minutes} min`;
-    } else {
-      const ago = toDay(t) - toDay(c.due);
-      meta = `${c.room} · <span class="late">due ${pretty(c.due)} (${ago} day${ago > 1 ? 's' : ''} ago)</span> · ${c.minutes} min`;
-    }
-    return `<li><button class="check" data-done="${c.id}" aria-label="Mark done"></button>
-      <div class="body" data-edit="${c.id}"><div class="name">${esc(c.name)}</div><div class="meta">${meta}</div></div>
-      ${mode === 'late' ? `<button class="skip" data-skip="${c.id}">Skip</button>` : ''}</li>`;
+  // All tab row: list only — no checkbox; time picker + drag handle
+  function listRow(c) {
+    const t = todayStr(), late = c.due < t;
+    const when = c.due === t ? 'due today' : late ? `past due ${pretty(c.due)}` : `next ${pretty(c.due)}`;
+    return `<li data-id="${c.id}">
+      <div class="body" data-edit="${c.id}"><div class="name">${esc(c.name)}</div>
+        <div class="meta">${weekday(c.due)} · <span class="${late ? 'late' : ''}">${when}</span></div></div>
+      <select data-min="${c.id}" aria-label="Time">${MINUTES.map(m => `<option value="${m}"${m === c.minutes ? ' selected' : ''}>${m} min</option>`).join('')}</select>
+      <span class="grip" data-grip="${c.id}" aria-label="Drag">≡</span></li>`;
+  }
+
+  // Today / Upcoming / Past Due rows: completable
+  function doRow(c, meta, extra = '') {
+    return `<li class="has-check"><button class="check" data-done="${c.id}" aria-label="Mark done"></button>
+      <div class="body" data-edit="${c.id}"><div class="name">${esc(c.name)}</div><div class="meta">${meta}</div></div>${extra}</li>`;
   }
 
   function render() {
@@ -187,35 +213,50 @@
     let h = '';
     if (!cs.length) {
       h = `<header><h1>Chores</h1><button data-open="settings">Settings</button></header>
-        <div class="empty">No chores yet.<br><br><button data-open="settings">Import your chores file</button><br>or<br><button data-add>Add a chore</button></div>`;
+        <div class="empty">No chores yet.<br><br><button data-open="settings">Import your chores file</button>
+        ${tab === 'all' ? '<br>or<br><button data-add>Add a chore</button>' : ''}</div>`;
     } else if (tab === 'all') {
-      h = `<header><h1>All</h1><span><button data-open="settings">Settings</button><button data-add>＋</button></span></header>
-        <div class="hsub">${n(cs.length,'chore')}</div>`;
+      h = `<header><h1>All</h1><span><button data-open="settings">Settings</button><button data-add aria-label="Add chore">＋</button></span></header>
+        <div class="hsub">${n(cs.length, 'chore')} · drag ≡ to move between frequencies</div>`;
       const byRoom = groupBy(cs, c => c.room);
       for (const room of Object.keys(byRoom).sort(roomSort)) {
-        h += `<h2>${esc(room)}</h2>`;
+        h += `<h2>${esc(room)} <span class="count">(${byRoom[room].length})</span></h2>`;
         const byFreq = groupBy(byRoom[room], c => c.every);
-        for (const f of Object.keys(byFreq).sort((a, b) => a - b)) {
-          const list = byFreq[f].sort((a, b) => a.due.localeCompare(b.due) || a.name.localeCompare(b.name));
-          h += `<h3>${freqLabel(f)}</h3><ul>${list.map(c => row(c, 'all')).join('')}</ul>`;
+        const freqs = [...new Set([...BUCKETS, ...Object.keys(byFreq).map(Number)])].sort((a, b) => a - b);
+        for (const f of freqs) {
+          const list = (byFreq[f] || []).sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+          h += `<h3>${freqLabel(f)}</h3><ul data-room="${esc(room)}" data-every="${f}">${
+            list.length ? list.map(listRow).join('') : '<li class="ph">Drag chores here</li>'}</ul>`;
         }
       }
     } else if (tab === 'today') {
-      h = `<header><h1>Today</h1><button data-add>＋</button></header><div class="hsub">${pretty(t)}${dueToday.length ? ` · ${n(dueToday.length,'chore')} · ~${mins(dueToday)} min` : ''}</div>`;
+      h = `<header><h1>Today</h1></header><div class="hsub">${pretty(t)}${dueToday.length ? ` · ${n(dueToday.length, 'chore')} · ~${mins(dueToday)} min` : ''}</div>`;
       if (!dueToday.length) h += `<div class="empty">Nothing due today.${late.length ? `<br>${late.length} past due.` : ''}</div>`;
       const byRoom = groupBy(dueToday, c => c.room);
       for (const room of Object.keys(byRoom).sort(roomSort))
-        h += `<h2>${esc(room)}</h2><ul>${byRoom[room].sort((a, b) => a.name.localeCompare(b.name)).map(c => row(c, 'today')).join('')}</ul>`;
+        h += `<h2>${esc(room)}</h2><ul>${byRoom[room].sort(byName).map(c => doRow(c, `${freqLabel(c.every).toLowerCase()} · ${c.minutes} min`)).join('')}</ul>`;
+
+      h += `<div class="section"><b>Upcoming</b></div>`;
+      for (const d of [addDays(t, 1), addDays(t, 2)]) {
+        const list = cs.filter(c => c.due === d).sort(byName);
+        h += `<h3>${d === addDays(t, 1) ? 'Tomorrow · ' : ''}${pretty(d)}${list.length ? ` · ${n(list.length, 'chore')} · ~${mins(list)} min` : ''}</h3>`;
+        h += list.length ? `<ul>${list.map(c => doRow(c, `${c.room} · ${c.minutes} min`)).join('')}</ul>` : `<ul><li class="ph">Nothing scheduled</li></ul>`;
+      }
     } else {
-      h = `<header><h1>Past Due</h1></header><div class="hsub">${late.length ? `${n(late.length,'chore')} · ~${mins(late)} min` : ''}</div>`;
+      h = `<header><h1>Past Due</h1></header><div class="hsub">${late.length ? `${n(late.length, 'chore')} · ~${mins(late)} min` : ''}</div>`;
       if (!late.length) h += `<div class="empty">All caught up.</div>`;
-      else h += `<ul style="margin-top:12px">${late.sort((a, b) => a.due.localeCompare(b.due)).map(c => row(c, 'late')).join('')}</ul>`;
+      else h += `<ul style="margin-top:12px">${late.sort((a, b) => a.due.localeCompare(b.due) || byName(a, b)).map(c => {
+        const ago = toDay(t) - toDay(c.due);
+        return doRow(c, `${c.room} · <span class="late">due ${pretty(c.due)} (${n(ago, 'day')} ago)</span> · ${c.minutes} min`,
+          `<button class="skip" data-skip="${c.id}">Skip</button>`);
+      }).join('')}</ul>`;
     }
     $('view').innerHTML = h;
   }
 
   // ---- taps ----
   document.addEventListener('click', e => {
+    if (justDragged) return;
     const el = e.target.closest('[data-done],[data-skip],[data-edit],[data-add],[data-open],[data-tab]');
     if (!el) return;
     if (el.dataset.done) { el.classList.add('on'); setTimeout(() => { complete(el.dataset.done); render(); }, 350); }
@@ -226,14 +267,78 @@
     else if (el.dataset.tab) { tab = el.dataset.tab; localStorage.setItem(KEY + '.tab', tab); render(); scrollTo(0, 0); }
   });
 
+  // time picker on All tab rows
+  document.addEventListener('change', e => {
+    const id = e.target.dataset && e.target.dataset.min;
+    if (!id) return;
+    find(id).minutes = +e.target.value; save();
+  });
+
+  // ---- drag to move between frequency buckets (touch + mouse) ----
+  let drag = null, justDragged = false;
+  document.addEventListener('pointerdown', e => {
+    const grip = e.target.closest('[data-grip]'); if (!grip) return;
+    e.preventDefault();
+    const li = grip.closest('li'), r = li.getBoundingClientRect();
+    const ghost = li.cloneNode(true); ghost.classList.add('ghost'); ghost.style.top = r.top + 'px'; ghost.style.width = '';
+    document.body.appendChild(ghost); li.classList.add('dragging'); document.body.classList.add('is-dragging');
+    const line = document.createElement('div'); line.className = 'drop-line';
+    drag = { id: grip.dataset.grip, li, ghost, line, offset: e.clientY - r.top, y: e.clientY, target: null, before: null };
+    drag.scroller = setInterval(() => {
+      if (!drag) return;
+      const edge = 90, vh = innerHeight;
+      if (drag.y < edge) scrollBy(0, -12); else if (drag.y > vh - edge - 60) scrollBy(0, 12); else return;
+      locate();
+    }, 16);
+    try { grip.setPointerCapture(e.pointerId); } catch {}
+  });
+  document.addEventListener('pointermove', e => {
+    if (!drag) return;
+    e.preventDefault();
+    drag.y = e.clientY; drag.x = e.clientX;
+    drag.ghost.style.top = (e.clientY - drag.offset) + 'px';
+    locate();
+  }, { passive: false });
+  function locate() {
+    const el = document.elementFromPoint(innerWidth / 2, drag.y);
+    const ul = el && el.closest('ul[data-every]');
+    document.querySelectorAll('ul.target').forEach(u => u !== ul && u.classList.remove('target'));
+    if (!ul) { drag.target = null; drag.line.remove(); return; }
+    ul.classList.add('target'); drag.target = ul;
+    const items = [...ul.querySelectorAll('li[data-id]')].filter(li => li !== drag.li);
+    drag.before = items.find(li => { const r = li.getBoundingClientRect(); return drag.y < r.top + r.height / 2; }) || null;
+    if (drag.before) ul.insertBefore(drag.line, drag.before); else ul.appendChild(drag.line);
+  }
+  function endDrag() {
+    if (!drag) return;
+    clearInterval(drag.scroller);
+    const { id, target, before } = drag;
+    drag.ghost.remove(); drag.line.remove(); drag.li.classList.remove('dragging');
+    document.body.classList.remove('is-dragging');
+    document.querySelectorAll('ul.target').forEach(u => u.classList.remove('target'));
+    drag = null; justDragged = true; setTimeout(() => justDragged = false, 50);
+    if (!target) return;
+    const c = find(id), room = target.dataset.room, every = +target.dataset.every;
+    const ids = [...target.querySelectorAll('li[data-id]')].map(li => li.dataset.id).filter(x => x !== id);
+    const at = before ? ids.indexOf(before.dataset.id) : ids.length;
+    ids.splice(at, 0, id);
+    const moved = c.every !== every || c.room !== room;
+    c.every = every; c.room = room;
+    ids.forEach((x, i) => find(x).order = i);
+    save(); render();
+    if (moved) toast(`${c.name} → ${freqLabel(every).toLowerCase()}`, null);
+  }
+  document.addEventListener('pointerup', endDrag);
+  document.addEventListener('pointercancel', endDrag);
+
   // ---- edit sheet ----
   let editing = null;
   function openEdit(id) {
     editing = id;
-    const c = state.chores.find(x => x.id === id) || { name: '', room: '', every: 1, minutes: 5, due: todayStr(), log: [] };
+    const c = find(id) || { name: '', room: '', every: 1, minutes: 5, due: todayStr(), log: [] };
     $('e-title').textContent = id ? 'Edit Chore' : 'New Chore';
     $('e-name').value = c.name; $('e-room').value = c.room; $('e-every').value = c.every;
-    $('e-min').value = c.minutes; $('e-due').value = c.due;
+    $('e-min').value = String(c.minutes); $('e-due').value = c.due;
     $('e-last').textContent = c.log.length ? `Last done ${pretty(c.log[0].done)}` : (id ? 'Not done yet in this app.' : '');
     $('e-delwrap').style.display = id ? '' : 'none';
     $('rooms').innerHTML = [...new Set(state.chores.map(x => x.room))].map(r => `<option value="${esc(r)}">`).join('');
@@ -244,9 +349,9 @@
   $('e-save').onclick = () => {
     const name = $('e-name').value.trim(), room = $('e-room').value.trim().toLowerCase();
     if (!name || !room || !$('e-due').value) return alert('Add a name, room and next due date.');
-    const data = { name, room, every: Math.max(1, parseInt($('e-every').value) || 1), minutes: Math.max(0, parseInt($('e-min').value) || 0), due: $('e-due').value };
-    if (editing) Object.assign(state.chores.find(x => x.id === editing), data);
-    else state.chores.push({ id: uid(), log: [], ...data });
+    const data = { name, room, every: Math.max(1, parseInt($('e-every').value) || 1), minutes: +$('e-min').value, due: $('e-due').value };
+    if (editing) Object.assign(find(editing), data);
+    else state.chores.push({ id: uid(), log: [], order: 1e6, ...data });
     save(); closeEdit(); render();
   };
   $('e-del').onclick = () => {
@@ -262,10 +367,12 @@
     try {
       const data = JSON.parse(await f.text());
       const t = todayStr();
-      const chores = (data.chores || []).map(c => {
-        const ch = { id: c.id || uid(), name: String(c.name), room: String(c.room).toLowerCase(), every: Math.max(1, +c.every || 1), minutes: +c.minutes || 0, due: c.due || c.start, log: c.log || [] };
-        // a fresh chores list (not a backup) starts at the next scheduled date from today
-        if (!c.due && ch.due < t) ch.due = nextAfter({ ...ch }, fromDay(toDay(t) - 1));
+      const from = addDays(t, -((dow(t) - IMPORT_START_WEEKDAY + 7) % 7));   // most recent Wednesday (or today if Wed)
+      const chores = (data.chores || []).map((c, i) => {
+        const ch = { id: c.id || uid(), name: String(c.name), room: String(c.room).toLowerCase(), every: Math.max(1, +c.every || 1),
+          minutes: snapMin(c.minutes), due: c.due || c.start, log: c.log || [], order: c.order ?? i };
+        // a fresh chores list (not a backup) is scheduled from `from` onward
+        if (!c.due && ch.due < from) ch.due = nextAfter({ ...ch }, addDays(from, -1));
         return ch;
       });
       if (!chores.length) throw 0;

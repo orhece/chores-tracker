@@ -14,51 +14,55 @@
 <link rel="manifest" href="manifest.webmanifest">
 <title>Chores</title>
 <style>
-  :root { --bg:#f2f2f7; --card:#fff; --text:#000; --sub:#8e8e93; --line:#c6c6c8; --accent:#007aff; --red:#ff3b30; --top:calc(env(safe-area-inset-top) + 20px); }
+  :root { --bg:#f2f2f7; --card:#fff; --text:#000; --sub:#8e8e93; --line:#c6c6c8; --accent:#C6FF8C; --on-accent:#000; --link:#2f7d00; --red:#ff3b30; --top:calc(env(safe-area-inset-top) + 20px); }
   @media (prefers-color-scheme: dark) {
-    :root { --bg:#000; --card:#1c1c1e; --text:#fff; --sub:#8e8e93; --line:#38383a; --accent:#0a84ff; --red:#ff453a; }
+    :root { --bg:#000; --card:#1c1c1e; --text:#fff; --sub:#8e8e93; --line:#38383a; --accent:#C6FF8C; --on-accent:#000; --link:#C6FF8C; --red:#ff453a; }
   }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { margin:0; background:var(--bg); color:var(--text); font:17px -apple-system, system-ui, sans-serif; }
-  body { padding:var(--top) 0 calc(80px + env(safe-area-inset-bottom)); -webkit-text-size-adjust:100%; }
+  body { padding:var(--top) 0 calc(100px + env(safe-area-inset-bottom)); -webkit-text-size-adjust:100%; }
   body.modal { overflow:hidden; }
-  .topbar { display:flex; justify-content:space-between; align-items:center; min-height:44px; padding:0 8px; }
+  .topbar { display:flex; justify-content:space-between; align-items:center; min-height:44px; padding:0 16px; margin-bottom:10px; }
   header { padding:0 16px 4px; }
   h1 { font-size:34px; margin:0; display:inline-block; }
   h1.tap { cursor:pointer; -webkit-user-select:none; user-select:none; }
   .hsub { color:var(--sub); font-size:15px; padding:0 16px 8px; }
-  button { font:inherit; color:var(--accent); background:none; border:0; padding:8px; cursor:pointer; }
+  button { font:inherit; color:var(--text); background:none; border:0; padding:8px; cursor:pointer; }
+  .pill { background:var(--accent); color:var(--on-accent); border-radius:999px; padding:7px 14px; font-size:15px; font-weight:600; margin-left:8px; }
+  .pill.sm { padding:5px 12px; font-size:14px; }
+  .topbar .pill:first-child { margin-left:0; }
   h2 { font-size:22px; margin:20px 16px 6px; text-transform:capitalize; }
   h2 .count { color:var(--sub); font-weight:400; }
-  h2.toggle { display:flex; align-items:center; gap:8px; cursor:pointer; -webkit-user-select:none; user-select:none; }
-  h2.toggle .chev { color:var(--sub); font-size:15px; width:14px; display:inline-block; transition:transform .15s; }
-  h2.toggle.closed .chev { transform:rotate(-90deg); }
-  h2 .redit { margin-left:auto; font-size:15px; font-weight:400; text-transform:none; padding:6px 0 6px 12px; }
+  h2.toggle { display:flex; align-items:center; cursor:pointer; -webkit-user-select:none; user-select:none; }
+  h2 .pill { margin-left:auto; text-transform:none; }
   h3 { font-size:13px; font-weight:400; color:var(--sub); text-transform:uppercase; margin:12px 16px 6px; }
   ul { list-style:none; margin:0 16px; padding:0; }
   li { display:flex; align-items:center; min-height:52px; padding:6px 12px; background:var(--card); border-radius:10px; margin-bottom:8px; }
   li.ph { color:var(--sub); font-size:15px; justify-content:center; }
   .check { flex:none; width:24px; height:24px; border-radius:50%; border:1.5px solid var(--line); margin-right:12px; padding:0; }
-  .check.on { background:var(--accent); border-color:var(--accent); box-shadow:inset 0 0 0 3px var(--card); }
+  .check.on { background:var(--accent); border-color:#7fbf3f; box-shadow:inset 0 0 0 3px var(--card); }
   .body { flex:1; min-width:0; padding-right:8px; cursor:pointer; }
   .name { text-transform:lowercase; }
   .meta { color:var(--sub); font-size:14px; margin-top:2px; }
   .wd { flex:none; width:48px; color:var(--sub); font-size:15px; }
   .mn { flex:none; width:52px; color:var(--sub); font-size:15px; text-align:right; }
   .late { color:var(--red); }
-  .skip { font-size:15px; flex:none; margin-right:-4px; }
   .empty { color:var(--sub); text-align:center; padding:48px 16px; }
   .section { font-size:28px; margin:32px 16px 0; }
-  nav { position:fixed; left:0; right:0; bottom:0; display:flex; background:var(--card); border-top:0.5px solid var(--line); padding-bottom:env(safe-area-inset-bottom); z-index:5; }
-  nav button { flex:1; min-height:56px; color:var(--sub); font-size:16px; }
-  nav button.on { color:var(--accent); font-weight:600; }
-  .badge { display:inline-block; min-width:20px; padding:0 6px; border-radius:10px; background:var(--red); color:#fff; font-size:13px; margin-left:5px; }
+  nav { position:fixed; left:20px; right:20px; bottom:calc(env(safe-area-inset-bottom) + 10px); display:flex; padding:5px; border-radius:999px; z-index:5;
+        background:rgba(255,255,255,.72); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+        border:0.5px solid rgba(0,0,0,.08); box-shadow:0 6px 24px rgba(0,0,0,.12); }
+  @media (prefers-color-scheme: dark) { nav { background:rgba(40,40,42,.72); border-color:rgba(255,255,255,.1); } }
+  nav button { flex:1; min-height:56px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border-radius:999px; padding:4px 0; color:var(--text); font-size:11px; font-weight:500; position:relative; }
+  nav button svg { width:24px; height:24px; }
+  nav button.on { background:var(--accent); color:var(--on-accent); font-weight:600; }
+  .badge { position:absolute; top:2px; left:calc(50% + 8px); min-width:18px; padding:0 5px; border-radius:9px; background:var(--red); color:#fff; font-size:11px; line-height:18px; font-weight:600; }
+  .badge.today { background:var(--text); color:var(--bg); }
   .sheet { position:fixed; inset:0; background:var(--bg); overflow-y:auto; overscroll-behavior:contain; padding:var(--top) 0 calc(24px + env(safe-area-inset-bottom)); display:none; z-index:10; }
   .sheet.open { display:block; }
-  .bar { display:flex; justify-content:space-between; align-items:center; padding:0 8px 8px; }
-  .bar b { font-size:17px; }
-  .bar > :first-child, .bar > :last-child { min-width:72px; }
-  .bar > :last-child { text-align:right; }
+  .bar { display:flex; justify-content:space-between; align-items:center; padding:0 16px 8px; position:relative; min-height:44px; }
+  .bar > b { font-size:17px; position:absolute; left:50%; transform:translateX(-50%); }
+  .bar .pill { margin:0; }
   label { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:46px; padding:0 12px; background:var(--card); }
   label + label { border-top:0.5px solid var(--line); }
   input { font:inherit; color:var(--text); background:none; border:0; text-align:right; flex:1; min-width:0; font-size:17px; }
@@ -71,10 +75,11 @@
   .group button { display:block; width:100%; text-align:left; padding:12px; background:var(--card); }
   .group button + button { border-top:0.5px solid var(--line); }
   #clear-list button { text-transform:capitalize; }
+  .empty .pill { margin:0; }
   .danger { color:var(--red) !important; }
   .note { color:var(--sub); font-size:13px; margin:6px 32px; }
-  #toast { position:fixed; left:16px; right:16px; bottom:calc(68px + env(safe-area-inset-bottom)); background:#333; color:#fff; border-radius:12px; padding:6px 6px 6px 14px; display:none; align-items:center; justify-content:space-between; z-index:20; min-height:44px; }
-  #toast button { color:#64d2ff; font-weight:600; }
+  #toast { position:fixed; left:16px; right:16px; bottom:calc(84px + env(safe-area-inset-bottom)); background:#333; color:#fff; border-radius:12px; padding:6px 6px 6px 14px; display:none; align-items:center; justify-content:space-between; z-index:20; min-height:44px; }
+  #toast button { color:var(--accent); font-weight:600; }
 </style>
 </head>
 <body>
@@ -82,16 +87,16 @@
 <main id="view"></main>
 
 <nav>
-  <button data-tab="all">All</button>
-  <button data-tab="today">Today<span id="b-today"></span></button>
-  <button data-tab="late">Past Due<span id="b-late"></span></button>
+  <button data-tab="all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/></svg>All</button>
+  <button data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M9 15l2 2 4-4"/></svg>Today<span id="b-today"></span></button>
+  <button data-tab="late"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5.5l3.5 2"/></svg>Past Due<span id="b-late"></span></button>
 </nav>
 
 <div id="toast"><span id="toast-msg"></span><button id="toast-undo">Undo</button></div>
 
 <!-- edit / add chore -->
 <div class="sheet" id="edit">
-  <div class="bar"><button id="e-cancel" style="text-align:left">Cancel</button><b id="e-title">Chore</b><button id="e-save"><b>Save</b></button></div>
+  <div class="bar"><button class="pill" id="e-cancel">Cancel</button><b id="e-title">Chore</b><button class="pill" id="e-save">Save</button></div>
   <div class="group">
     <label>Chore <input id="e-name" autocomplete="off" placeholder="name"></label>
     <label>Room <select id="e-room"></select></label>
@@ -105,20 +110,20 @@
 
 <!-- rename / delete room -->
 <div class="sheet" id="roomsheet">
-  <div class="bar"><button id="r-cancel" style="text-align:left">Cancel</button><b>Room</b><button id="r-save"><b>Save</b></button></div>
+  <div class="bar"><button class="pill" id="r-cancel">Cancel</button><b>Room</b><button class="pill" id="r-save">Save</button></div>
   <div class="group"><label>Name <input id="r-name" autocomplete="off"></label></div>
   <div class="group"><button class="danger" id="r-del">Delete Room</button></div>
 </div>
 
 <!-- clear past due by room -->
 <div class="sheet" id="clearsheet">
-  <div class="bar"><button id="c-cancel" style="text-align:left">Cancel</button><b>Clear Room</b><span></span></div>
+  <div class="bar"><button class="pill" id="c-cancel">Cancel</button><b>Clear Room</b><span></span></div>
   <div class="group" id="clear-list"></div>
 </div>
 
 <!-- settings -->
 <div class="sheet" id="settings">
-  <div class="bar"><span></span><b>Settings</b><button id="s-done"><b>Done</b></button></div>
+  <div class="bar"><span></span><b>Settings</b><button class="pill" id="s-done">Done</button></div>
   <div class="group">
     <button id="s-import">Import chores / backup file…</button>
     <button id="s-export">Export backup</button>
@@ -195,6 +200,23 @@
     save(); render();
     toast(label || `Cleared ${list.length === 1 ? '1 chore' : list.length + ' chores'}`, () => { before.forEach(([c, d]) => c.due = d); save(); render(); });
   }
+  function completeToday() {
+    const t = todayStr(), list = state.chores.filter(c => c.due === t);
+    if (!list.length) return;
+    const before = list.map(c => [c, c.due, c.log.slice()]);
+    list.forEach(c => { c.log.unshift({ done: t, due: c.due }); c.log = c.log.slice(0, 50); c.due = nextAfter(c, t); });
+    save(); render();
+    toast(`Completed ${list.length === 1 ? '1 chore' : list.length + ' chores'}`, () => { before.forEach(([c, d, l]) => { c.due = d; c.log = l; }); save(); render(); });
+  }
+  // a chore that laps (misses a date and its next date arrives) moves to its latest date and the missed one is dropped
+  function rollForward() {
+    const t = toDay(todayStr()); let changed = false;
+    for (const c of state.chores) {
+      const p = 7 * c.every, d = toDay(c.due);
+      if (d < t && t - d >= p) { c.due = fromDay(d + Math.floor((t - d) / p) * p); changed = true; }
+    }
+    if (changed) save();
+  }
   function toggleAll() {
     if (state.rooms.every(r => collapsed.has(r))) collapsed.clear(); else state.rooms.forEach(r => collapsed.add(r));
     saveCollapsed(); render();
@@ -234,23 +256,23 @@
       <div class="body" data-edit="${c.id}"><div class="name">${esc(c.name)}</div><div class="meta">${meta}</div></div>${extra}</li>`;
 
   function render() {
+    rollForward();
     const t = todayStr(), cs = state.chores;
     const dueToday = cs.filter(c => c.due === t), late = cs.filter(c => c.due < t);
-    $('b-today').innerHTML = dueToday.length ? `<span class="badge" style="background:var(--accent)">${dueToday.length}</span>` : '';
+    $('b-today').innerHTML = dueToday.length ? `<span class="badge today">${dueToday.length}</span>` : '';
     $('b-late').innerHTML = late.length ? `<span class="badge">${late.length}</span>` : '';
     document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
 
     let h = '';
     if (tab === 'all') {
-      h = `<div class="topbar"><button data-open="settings">Settings</button>
-          <span><button data-add-room>Room +</button><button data-add>Chores +</button></span></div>
+      h = `<div class="topbar"><button class="pill" data-open="settings">Settings</button>
+          <span><button class="pill" data-add-room>Room +</button><button class="pill" data-add>Chores +</button></span></div>
         <header><h1 class="tap" data-toggle-all>All</h1></header><div class="hsub">${n(cs.length, 'chore')}</div>`;
-      if (!state.rooms.length) h += `<div class="empty">No chores yet.<br><br><button data-open="settings">Import your chores file</button></div>`;
+      if (!state.rooms.length) h += `<div class="empty">No chores yet.<br><br><button class="pill" data-open="settings">Import your chores file</button></div>`;
       const byRoom = groupBy(cs, c => c.room);
       for (const room of state.rooms) {
         const list = byRoom[room] || [], closed = collapsed.has(room);
-        h += `<h2 class="toggle${closed ? ' closed' : ''}" data-toggle="${esc(room)}"><span class="chev">▾</span>
-          <span>${esc(room)} <span class="count">(${list.length})</span></span><button class="redit" data-room-edit="${esc(room)}">Edit</button></h2>`;
+        h += `<h2 class="toggle${closed ? ' closed' : ''}" data-toggle="${esc(room)}"><span>${esc(room)} <span class="count">(${list.length})</span></span><button class="pill sm" data-room-edit="${esc(room)}">Edit</button></h2>`;
         if (closed) continue;
         const byFreq = groupBy(list, c => c.every);
         for (const f of Object.keys(byFreq).map(Number).sort((a, b) => a - b)) {
@@ -259,7 +281,7 @@
         }
       }
     } else if (tab === 'today') {
-      h = `<div class="topbar"></div><header><h1>Today</h1></header>
+      h = `<div class="topbar"><span></span>${dueToday.length ? '<button class="pill" data-complete-all>Complete All</button>' : ''}</div><header><h1>Today</h1></header>
         <div class="hsub">${pretty(t)}${dueToday.length ? ` · ${n(dueToday.length, 'chore')} · ~${mins(dueToday)} min` : ''}</div>`;
       if (!dueToday.length) h += `<div class="empty">Nothing due today.${late.length ? `<br>${late.length} past due.` : ''}</div>`;
       const byRoom = groupBy(dueToday, c => c.room);
@@ -273,13 +295,13 @@
         h += `<ul>${list.length ? list.map(c => doRow(c, `${c.room} · ${c.minutes} min`)).join('') : '<li class="ph">Nothing scheduled</li>'}</ul>`;
       }
     } else {
-      h = `<div class="topbar"><span></span>${late.length ? `<span><button data-clear-room>Clear Room</button><button data-clear-all>Clear All</button></span>` : ''}</div>
+      h = `<div class="topbar"><span></span>${late.length ? `<span><button class="pill" data-clear-room>Clear Room</button><button class="pill" data-clear-all>Clear All</button></span>` : ''}</div>
         <header><h1>Past Due</h1></header><div class="hsub">${late.length ? `${n(late.length, 'chore')} · ~${mins(late)} min` : ''}</div>`;
       if (!late.length) h += `<div class="empty">All caught up.</div>`;
       else h += `<ul style="margin-top:12px">${late.sort((a, b) => a.due.localeCompare(b.due) || byName(a, b)).map(c => {
         const ago = toDay(t) - toDay(c.due);
         return doRow(c, `${c.room} · <span class="late">${n(ago, 'day')} ago</span> · ${c.minutes} min`,
-          `<button class="skip" data-skip="${c.id}">Skip</button>`);
+          `<button class="pill sm" data-skip="${c.id}">Skip</button>`);
       }).join('')}</ul>`;
     }
     $('view').innerHTML = h;
@@ -287,7 +309,7 @@
 
   // ---- taps ----
   document.addEventListener('click', e => {
-    const el = e.target.closest('[data-done],[data-skip],[data-edit],[data-add],[data-add-room],[data-room-edit],[data-toggle],[data-toggle-all],[data-clear-all],[data-clear-room],[data-clear-pick],[data-open],[data-tab]');
+    const el = e.target.closest('[data-done],[data-skip],[data-edit],[data-add],[data-add-room],[data-room-edit],[data-toggle],[data-toggle-all],[data-clear-all],[data-complete-all],[data-clear-room],[data-clear-pick],[data-open],[data-tab]');
     if (!el) return;
     const d = el.dataset;
     if (d.done) { el.classList.add('on'); setTimeout(() => { complete(d.done); render(); }, 350); }
@@ -299,6 +321,7 @@
     else if (d.toggle) { collapsed.has(d.toggle) ? collapsed.delete(d.toggle) : collapsed.add(d.toggle); saveCollapsed(); render(); }
     else if ('toggleAll' in d) toggleAll();
     else if ('clearAll' in d) clearLate(() => true);
+    else if ('completeAll' in d) completeToday();
     else if ('clearRoom' in d) openClearRoom();
     else if (d.clearPick) { closeSheet('clearsheet'); clearLate(c => c.room === d.clearPick); }
     else if (d.open) openSheet(d.open);

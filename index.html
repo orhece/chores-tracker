@@ -20,55 +20,60 @@
   }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { margin:0; background:var(--bg); color:var(--text); font:17px -apple-system, system-ui, sans-serif; }
-  body { padding:env(safe-area-inset-top) 0 calc(60px + env(safe-area-inset-bottom)); -webkit-text-size-adjust:100%; }
-  header { display:flex; align-items:flex-end; justify-content:space-between; padding:12px 16px 4px; min-height:56px; }
+  body { padding:env(safe-area-inset-top) 0 calc(80px + env(safe-area-inset-bottom)); -webkit-text-size-adjust:100%; }
+  body.modal { overflow:hidden; }
+  .topbar { display:flex; justify-content:space-between; align-items:center; min-height:44px; padding:0 8px; }
+  header { padding:0 16px 4px; }
   h1 { font-size:34px; margin:0; }
   .hsub { color:var(--sub); font-size:15px; padding:0 16px 8px; }
   button { font:inherit; color:var(--accent); background:none; border:0; padding:8px; cursor:pointer; }
   h2 { font-size:22px; margin:20px 16px 6px; text-transform:capitalize; }
   h2 .count { color:var(--sub); font-weight:400; }
+  h2.toggle { display:flex; align-items:center; gap:8px; cursor:pointer; -webkit-user-select:none; user-select:none; }
+  h2.toggle .chev { color:var(--sub); font-size:15px; width:14px; display:inline-block; transition:transform .15s; }
+  h2.toggle.closed .chev { transform:rotate(-90deg); }
   h3 { font-size:13px; font-weight:400; color:var(--sub); text-transform:uppercase; margin:12px 16px 6px; }
-  ul { list-style:none; margin:0 16px; padding:0; background:var(--card); border-radius:10px; overflow:hidden; min-height:44px; }
-  li { display:flex; align-items:center; min-height:52px; padding:6px 0 6px 12px; position:relative; }
-  li + li::before { content:""; position:absolute; top:0; left:12px; right:0; border-top:0.5px solid var(--line); }
-  li.has-check + li::before { left:48px; }
+  ul { list-style:none; margin:0 16px; padding:0; }
+  li { display:flex; align-items:center; min-height:52px; padding:6px 0 6px 12px; background:var(--card); border-radius:10px; margin-bottom:8px; }
+  ul[data-every]:empty { min-height:52px; border:1.5px dashed var(--line); border-radius:10px; margin-bottom:8px; }
   li.ph { color:var(--sub); font-size:15px; justify-content:center; padding-right:12px; }
   .check { flex:none; width:24px; height:24px; border-radius:50%; border:1.5px solid var(--line); margin-right:12px; padding:0; }
   .check.on { background:var(--accent); border-color:var(--accent); box-shadow:inset 0 0 0 3px var(--card); }
   .body { flex:1; min-width:0; padding-right:8px; }
   .name { text-transform:lowercase; }
   .meta { color:var(--sub); font-size:14px; margin-top:2px; }
+  .wd { flex:none; width:48px; color:var(--sub); font-size:15px; }
+  .mn { flex:none; width:52px; color:var(--sub); font-size:15px; text-align:right; }
   .late { color:var(--red); }
   .skip { font-size:15px; flex:none; margin-right:4px; }
-  select { font:inherit; font-size:15px; color:var(--accent); background:none; border:0; flex:none; padding:8px 4px; -webkit-appearance:none; appearance:none; }
   .grip { flex:none; width:44px; align-self:stretch; display:flex; align-items:center; justify-content:center; color:var(--sub); font-size:20px; touch-action:none; -webkit-user-select:none; user-select:none; cursor:grab; }
   .dragging { opacity:.3; }
-  .ghost { position:fixed; left:16px; right:16px; z-index:30; background:var(--card); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.25); pointer-events:none; }
-  .ghost::before { display:none; }
-  ul.target { outline:2px solid var(--accent); }
-  .drop-line { height:3px; background:var(--accent); margin:0 12px; border-radius:2px; }
+  .ghost { position:fixed; left:16px; right:16px; z-index:30; box-shadow:0 8px 24px rgba(0,0,0,.25); pointer-events:none; margin:0; }
+  ul.target { outline:2px solid var(--accent); outline-offset:3px; border-radius:10px; }
+  .drop-line { height:3px; background:var(--accent); margin:0 12px 8px; border-radius:2px; }
   body.is-dragging { -webkit-user-select:none; user-select:none; }
   .empty { color:var(--sub); text-align:center; padding:48px 16px; }
   .section { font-size:28px; margin:32px 16px 0; }
   nav { position:fixed; left:0; right:0; bottom:0; display:flex; background:var(--card); border-top:0.5px solid var(--line); padding-bottom:env(safe-area-inset-bottom); z-index:5; }
-  nav button { flex:1; padding:10px 0 8px; color:var(--sub); font-size:12px; position:relative; }
+  nav button { flex:1; min-height:56px; color:var(--sub); font-size:16px; }
   nav button.on { color:var(--accent); font-weight:600; }
-  .badge { display:inline-block; min-width:18px; padding:0 5px; border-radius:9px; background:var(--red); color:#fff; font-size:12px; margin-left:4px; }
-  .sheet { position:fixed; inset:0; background:var(--bg); overflow:auto; padding:env(safe-area-inset-top) 0 calc(24px + env(safe-area-inset-bottom)); display:none; z-index:10; }
+  .badge { display:inline-block; min-width:20px; padding:0 6px; border-radius:10px; background:var(--red); color:#fff; font-size:13px; margin-left:5px; }
+  .sheet { position:fixed; inset:0; background:var(--bg); overflow-y:auto; overscroll-behavior:contain; padding:env(safe-area-inset-top) 0 calc(24px + env(safe-area-inset-bottom)); display:none; z-index:10; }
   .sheet.open { display:block; }
   .bar { display:flex; justify-content:space-between; align-items:center; padding:8px; }
   .bar b { font-size:17px; }
   label { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:46px; padding:0 12px; background:var(--card); }
   label + label { border-top:0.5px solid var(--line); }
   input { font:inherit; color:var(--text); background:none; border:0; text-align:right; flex:1; min-width:0; font-size:17px; }
-  label select { font-size:17px; color:var(--sub); text-align:right; }
-  input:focus { outline:none; }
+  label select { font:inherit; font-size:17px; color:var(--sub); background:none; border:0; text-align:right; -webkit-appearance:none; appearance:none; }
+  #e-room { text-transform:capitalize; }
+  input:focus, select:focus { outline:none; }
   .group { margin:16px; border-radius:10px; overflow:hidden; }
   .group button { display:block; width:100%; text-align:left; padding:12px; background:var(--card); }
   .group button + button { border-top:0.5px solid var(--line); }
   .danger { color:var(--red) !important; }
   .note { color:var(--sub); font-size:13px; margin:6px 32px; }
-  #toast { position:fixed; left:16px; right:16px; bottom:calc(72px + env(safe-area-inset-bottom)); background:#333; color:#fff; border-radius:12px; padding:6px 6px 6px 14px; display:none; align-items:center; justify-content:space-between; z-index:20; }
+  #toast { position:fixed; left:16px; right:16px; bottom:calc(68px + env(safe-area-inset-bottom)); background:#333; color:#fff; border-radius:12px; padding:6px 6px 6px 14px; display:none; align-items:center; justify-content:space-between; z-index:20; min-height:44px; }
   #toast button { color:#64d2ff; font-weight:600; }
 </style>
 </head>
@@ -89,14 +94,13 @@
   <div class="bar"><button id="e-cancel">Cancel</button><b id="e-title">Chore</b><button id="e-save"><b>Save</b></button></div>
   <div class="group">
     <label>Chore <input id="e-name" autocomplete="off" placeholder="name"></label>
-    <label>Room <input id="e-room" autocomplete="off" list="rooms" placeholder="room"></label>
+    <label>Room <select id="e-room"></select></label>
     <label>Every _ weeks <input id="e-every" type="number" inputmode="numeric" min="1"></label>
     <label>Time <select id="e-min"><option value="3">3 min</option><option value="5">5 min</option><option value="10">10 min</option></select></label>
     <label>Next due <input id="e-due" type="date"></label>
   </div>
   <p class="note" id="e-last"></p>
   <div class="group" id="e-delwrap"><button class="danger" id="e-del">Delete Chore</button></div>
-  <datalist id="rooms"></datalist>
 </div>
 
 <!-- settings -->
@@ -106,7 +110,6 @@
     <button id="s-import">Import chores / backup file…</button>
     <button id="s-export">Export backup</button>
   </div>
-  <p class="note">Everything is stored only on this device. Nothing is sent anywhere. Export a backup now and then — if you delete the app from your home screen, its data goes with it.</p>
   <div class="group"><button class="danger" id="s-wipe">Delete all data on this device</button></div>
   <input type="file" id="s-file" accept=".json,application/json" hidden>
 </div>
@@ -117,7 +120,6 @@
   const $ = id => document.getElementById(id);
   const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const MINUTES = [3, 5, 10];
   const BUCKETS = [1, 2, 4];          // frequency buckets always shown in each room (weeks)
   const IMPORT_START_WEEKDAY = 3;     // TESTING: a fresh chores file is scheduled from the most recent Wednesday (0 = Sun … 6 = Sat)
 
@@ -132,6 +134,7 @@
   const addDays = (s, n) => fromDay(toDay(s) + n);
   const freqLabel = n => n == 1 ? 'Weekly' : `Every ${n} weeks`;
   const snapMin = m => (m = +m || 5) <= 3 ? 3 : m <= 7 ? 5 : 10;
+  const cleanRoom = r => String(r || '').trim().toLowerCase();
 
   // first scheduled date strictly after `after` (keeps the chore on its weekday rhythm)
   const nextAfter = (c, after) => {
@@ -140,18 +143,24 @@
     return fromDay(d);
   };
 
-  // ---- storage ----
+  // ---- storage: { rooms: [...], chores: [...] } ----
   let state = load();
+  function tidy(s) {
+    s.chores.forEach((c, i) => { c.minutes = snapMin(c.minutes); c.room = cleanRoom(c.room); if (c.order == null) c.order = i; });
+    s.rooms = [...new Set([...(s.rooms || []).map(cleanRoom), ...s.chores.map(c => c.room)])].filter(Boolean).sort();
+    return s;
+  }
   function load() {
     let s; try { s = JSON.parse(localStorage.getItem(KEY)); } catch {}
-    s = s && Array.isArray(s.chores) ? s : { chores: [] };
-    s.chores.forEach((c, i) => { c.minutes = snapMin(c.minutes); if (c.order == null) c.order = i; });
-    return s;
+    return tidy(s && Array.isArray(s.chores) ? s : { rooms: [], chores: [] });
   }
   function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
   const uid = () => Math.random().toString(36).slice(2, 10);
   const find = id => state.chores.find(x => x.id === id);
+
+  let collapsed = new Set(JSON.parse(localStorage.getItem(KEY + '.collapsed') || '[]'));
+  const saveCollapsed = () => localStorage.setItem(KEY + '.collapsed', JSON.stringify([...collapsed]));
 
   // ---- actions ----
   let undo = null, toastTimer = null;
@@ -170,6 +179,12 @@
     c.due = nextAfter(c, todayStr()); save(); render();
     toast(`Skipped · next ${pretty(c.due)}`, () => { c.due = before; save(); render(); });
   }
+  function addRoom() {
+    const r = cleanRoom(prompt('New room'));
+    if (!r) return;
+    if (state.rooms.includes(r)) return alert('That room already exists.');
+    state.rooms.push(r); state.rooms.sort(); collapsed.delete(r); saveCollapsed(); save(); render();
+  }
   function toast(msg, fn) {
     undo = fn; $('toast-msg').textContent = msg; $('toast').style.display = 'flex';
     $('toast-undo').style.display = fn ? '' : 'none';
@@ -177,31 +192,27 @@
   }
   $('toast-undo').onclick = () => { if (undo) undo(); undo = null; $('toast').style.display = 'none'; };
 
+  // ---- sheets (lock the page behind them so only one thing scrolls) ----
+  const openSheet = id => { $(id).classList.add('open'); $(id).scrollTop = 0; document.body.classList.add('modal'); };
+  const closeSheet = id => { $(id).classList.remove('open'); document.body.classList.remove('modal'); if (document.activeElement) document.activeElement.blur(); };
+
   // ---- rendering ----
   let tab = localStorage.getItem(KEY + '.tab') || 'today';
   const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
-  const roomSort = (a, b) => (a === 'misc') - (b === 'misc') || a.localeCompare(b);
   const groupBy = (arr, f) => arr.reduce((m, x) => ((m[f(x)] ||= []).push(x), m), {});
   const mins = list => list.reduce((s, c) => s + (+c.minutes || 0), 0);
   const n = (k, w) => `${k} ${w}${k === 1 ? '' : 's'}`;
   const byName = (a, b) => a.room.localeCompare(b.room) || a.name.localeCompare(b.name);
 
-  // All tab row: list only — no checkbox; time picker + drag handle
-  function listRow(c) {
-    const t = todayStr(), late = c.due < t;
-    const when = c.due === t ? 'due today' : late ? `past due ${pretty(c.due)}` : `next ${pretty(c.due)}`;
-    return `<li data-id="${c.id}">
-      <div class="body" data-edit="${c.id}"><div class="name">${esc(c.name)}</div>
-        <div class="meta">${weekday(c.due)} · <span class="${late ? 'late' : ''}">${when}</span></div></div>
-      <select data-min="${c.id}" aria-label="Time">${MINUTES.map(m => `<option value="${m}"${m === c.minutes ? ' selected' : ''}>${m} min</option>`).join('')}</select>
+  // All tab row: name · weekday · minutes · drag handle
+  const listRow = c => `<li data-id="${c.id}">
+      <div class="body" data-edit="${c.id}"><div class="name">${esc(c.name)}</div></div>
+      <span class="wd">${weekday(c.due)}</span><span class="mn">${c.minutes} min</span>
       <span class="grip" data-grip="${c.id}" aria-label="Drag">≡</span></li>`;
-  }
 
   // Today / Upcoming / Past Due rows: completable
-  function doRow(c, meta, extra = '') {
-    return `<li class="has-check"><button class="check" data-done="${c.id}" aria-label="Mark done"></button>
+  const doRow = (c, meta, extra = '') => `<li><button class="check" data-done="${c.id}" aria-label="Mark done"></button>
       <div class="body" data-edit="${c.id}"><div class="name">${esc(c.name)}</div><div class="meta">${meta}</div></div>${extra}</li>`;
-  }
 
   function render() {
     const t = todayStr(), cs = state.chores;
@@ -211,39 +222,39 @@
     document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
 
     let h = '';
-    if (!cs.length) {
-      h = `<header><h1>Chores</h1><button data-open="settings">Settings</button></header>
-        <div class="empty">No chores yet.<br><br><button data-open="settings">Import your chores file</button>
-        ${tab === 'all' ? '<br>or<br><button data-add>Add a chore</button>' : ''}</div>`;
-    } else if (tab === 'all') {
-      h = `<header><h1>All</h1><span><button data-open="settings">Settings</button><button data-add aria-label="Add chore">＋</button></span></header>
-        <div class="hsub">${n(cs.length, 'chore')} · drag ≡ to move between frequencies</div>`;
+    if (tab === 'all') {
+      h = `<div class="topbar"><button data-open="settings">Settings</button>
+          <span><button data-add-room>Room +</button><button data-add>Chores +</button></span></div>
+        <header><h1>All</h1></header><div class="hsub">${n(cs.length, 'chore')}</div>`;
+      if (!state.rooms.length) h += `<div class="empty">No chores yet.<br><br><button data-open="settings">Import your chores file</button></div>`;
       const byRoom = groupBy(cs, c => c.room);
-      for (const room of Object.keys(byRoom).sort(roomSort)) {
-        h += `<h2>${esc(room)} <span class="count">(${byRoom[room].length})</span></h2>`;
-        const byFreq = groupBy(byRoom[room], c => c.every);
+      for (const room of state.rooms) {
+        const list = byRoom[room] || [], closed = collapsed.has(room);
+        h += `<h2 class="toggle${closed ? ' closed' : ''}" data-toggle="${esc(room)}"><span class="chev">▾</span><span>${esc(room)} <span class="count">(${list.length})</span></span></h2>`;
+        if (closed) continue;
+        const byFreq = groupBy(list, c => c.every);
         const freqs = [...new Set([...BUCKETS, ...Object.keys(byFreq).map(Number)])].sort((a, b) => a - b);
         for (const f of freqs) {
-          const list = (byFreq[f] || []).sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-          h += `<h3>${freqLabel(f)}</h3><ul data-room="${esc(room)}" data-every="${f}">${
-            list.length ? list.map(listRow).join('') : '<li class="ph">Drag chores here</li>'}</ul>`;
+          const items = (byFreq[f] || []).sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+          h += `<h3>${freqLabel(f)}</h3><ul data-room="${esc(room)}" data-every="${f}">${items.map(listRow).join('')}</ul>`;
         }
       }
     } else if (tab === 'today') {
-      h = `<header><h1>Today</h1></header><div class="hsub">${pretty(t)}${dueToday.length ? ` · ${n(dueToday.length, 'chore')} · ~${mins(dueToday)} min` : ''}</div>`;
+      h = `<div class="topbar"></div><header><h1>Today</h1></header>
+        <div class="hsub">${pretty(t)}${dueToday.length ? ` · ${n(dueToday.length, 'chore')} · ~${mins(dueToday)} min` : ''}</div>`;
       if (!dueToday.length) h += `<div class="empty">Nothing due today.${late.length ? `<br>${late.length} past due.` : ''}</div>`;
       const byRoom = groupBy(dueToday, c => c.room);
-      for (const room of Object.keys(byRoom).sort(roomSort))
+      for (const room of Object.keys(byRoom).sort())
         h += `<h2>${esc(room)}</h2><ul>${byRoom[room].sort(byName).map(c => doRow(c, `${freqLabel(c.every).toLowerCase()} · ${c.minutes} min`)).join('')}</ul>`;
 
       h += `<div class="section"><b>Upcoming</b></div>`;
       for (const d of [addDays(t, 1), addDays(t, 2)]) {
         const list = cs.filter(c => c.due === d).sort(byName);
         h += `<h3>${d === addDays(t, 1) ? 'Tomorrow · ' : ''}${pretty(d)}${list.length ? ` · ${n(list.length, 'chore')} · ~${mins(list)} min` : ''}</h3>`;
-        h += list.length ? `<ul>${list.map(c => doRow(c, `${c.room} · ${c.minutes} min`)).join('')}</ul>` : `<ul><li class="ph">Nothing scheduled</li></ul>`;
+        h += `<ul>${list.length ? list.map(c => doRow(c, `${c.room} · ${c.minutes} min`)).join('') : '<li class="ph">Nothing scheduled</li>'}</ul>`;
       }
     } else {
-      h = `<header><h1>Past Due</h1></header><div class="hsub">${late.length ? `${n(late.length, 'chore')} · ~${mins(late)} min` : ''}</div>`;
+      h = `<div class="topbar"></div><header><h1>Past Due</h1></header><div class="hsub">${late.length ? `${n(late.length, 'chore')} · ~${mins(late)} min` : ''}</div>`;
       if (!late.length) h += `<div class="empty">All caught up.</div>`;
       else h += `<ul style="margin-top:12px">${late.sort((a, b) => a.due.localeCompare(b.due) || byName(a, b)).map(c => {
         const ago = toDay(t) - toDay(c.due);
@@ -257,21 +268,17 @@
   // ---- taps ----
   document.addEventListener('click', e => {
     if (justDragged) return;
-    const el = e.target.closest('[data-done],[data-skip],[data-edit],[data-add],[data-open],[data-tab]');
+    const el = e.target.closest('[data-done],[data-skip],[data-edit],[data-add],[data-add-room],[data-toggle],[data-open],[data-tab]');
     if (!el) return;
-    if (el.dataset.done) { el.classList.add('on'); setTimeout(() => { complete(el.dataset.done); render(); }, 350); }
-    else if (el.dataset.skip) skip(el.dataset.skip);
-    else if (el.dataset.edit) openEdit(el.dataset.edit);
-    else if ('add' in el.dataset) openEdit(null);
-    else if (el.dataset.open) $(el.dataset.open).classList.add('open');
-    else if (el.dataset.tab) { tab = el.dataset.tab; localStorage.setItem(KEY + '.tab', tab); render(); scrollTo(0, 0); }
-  });
-
-  // time picker on All tab rows
-  document.addEventListener('change', e => {
-    const id = e.target.dataset && e.target.dataset.min;
-    if (!id) return;
-    find(id).minutes = +e.target.value; save();
+    const d = el.dataset;
+    if (d.done) { el.classList.add('on'); setTimeout(() => { complete(d.done); render(); }, 350); }
+    else if (d.skip) skip(d.skip);
+    else if (d.edit) openEdit(d.edit);
+    else if ('add' in d) openEdit(null);
+    else if ('addRoom' in d) addRoom();
+    else if (d.toggle) { collapsed.has(d.toggle) ? collapsed.delete(d.toggle) : collapsed.add(d.toggle); saveCollapsed(); render(); }
+    else if (d.open) openSheet(d.open);
+    else if (d.tab) { tab = d.tab; localStorage.setItem(KEY + '.tab', tab); render(); scrollTo(0, 0); }
   });
 
   // ---- drag to move between frequency buckets (touch + mouse) ----
@@ -280,14 +287,14 @@
     const grip = e.target.closest('[data-grip]'); if (!grip) return;
     e.preventDefault();
     const li = grip.closest('li'), r = li.getBoundingClientRect();
-    const ghost = li.cloneNode(true); ghost.classList.add('ghost'); ghost.style.top = r.top + 'px'; ghost.style.width = '';
+    const ghost = li.cloneNode(true); ghost.classList.add('ghost'); ghost.style.top = r.top + 'px';
     document.body.appendChild(ghost); li.classList.add('dragging'); document.body.classList.add('is-dragging');
     const line = document.createElement('div'); line.className = 'drop-line';
     drag = { id: grip.dataset.grip, li, ghost, line, offset: e.clientY - r.top, y: e.clientY, target: null, before: null };
     drag.scroller = setInterval(() => {
       if (!drag) return;
-      const edge = 90, vh = innerHeight;
-      if (drag.y < edge) scrollBy(0, -12); else if (drag.y > vh - edge - 60) scrollBy(0, 12); else return;
+      const edge = 90;
+      if (drag.y < edge) scrollBy(0, -12); else if (drag.y > innerHeight - edge - 70) scrollBy(0, 12); else return;
       locate();
     }, 16);
     try { grip.setPointerCapture(e.pointerId); } catch {}
@@ -295,7 +302,7 @@
   document.addEventListener('pointermove', e => {
     if (!drag) return;
     e.preventDefault();
-    drag.y = e.clientY; drag.x = e.clientX;
+    drag.y = e.clientY;
     drag.ghost.style.top = (e.clientY - drag.offset) + 'px';
     locate();
   }, { passive: false });
@@ -320,8 +327,7 @@
     if (!target) return;
     const c = find(id), room = target.dataset.room, every = +target.dataset.every;
     const ids = [...target.querySelectorAll('li[data-id]')].map(li => li.dataset.id).filter(x => x !== id);
-    const at = before ? ids.indexOf(before.dataset.id) : ids.length;
-    ids.splice(at, 0, id);
+    ids.splice(before ? ids.indexOf(before.dataset.id) : ids.length, 0, id);
     const moved = c.every !== every || c.room !== room;
     c.every = every; c.room = room;
     ids.forEach((x, i) => find(x).order = i);
@@ -334,33 +340,33 @@
   // ---- edit sheet ----
   let editing = null;
   function openEdit(id) {
+    if (!id && !state.rooms.length) return alert('Add a room first.');
     editing = id;
-    const c = find(id) || { name: '', room: '', every: 1, minutes: 5, due: todayStr(), log: [] };
+    const c = find(id) || { name: '', room: state.rooms[0], every: 1, minutes: 5, due: todayStr(), log: [] };
     $('e-title').textContent = id ? 'Edit Chore' : 'New Chore';
+    $('e-room').innerHTML = state.rooms.map(r => `<option value="${esc(r)}">${esc(r)}</option>`).join('');
     $('e-name').value = c.name; $('e-room').value = c.room; $('e-every').value = c.every;
     $('e-min').value = String(c.minutes); $('e-due').value = c.due;
-    $('e-last').textContent = c.log.length ? `Last done ${pretty(c.log[0].done)}` : (id ? 'Not done yet in this app.' : '');
+    $('e-last').textContent = c.log.length ? `Last done ${pretty(c.log[0].done)}` : '';
     $('e-delwrap').style.display = id ? '' : 'none';
-    $('rooms').innerHTML = [...new Set(state.chores.map(x => x.room))].map(r => `<option value="${esc(r)}">`).join('');
-    $('edit').classList.add('open');
+    openSheet('edit');
   }
-  const closeEdit = () => { $('edit').classList.remove('open'); document.activeElement.blur(); };
-  $('e-cancel').onclick = closeEdit;
+  $('e-cancel').onclick = () => closeSheet('edit');
   $('e-save').onclick = () => {
-    const name = $('e-name').value.trim(), room = $('e-room').value.trim().toLowerCase();
-    if (!name || !room || !$('e-due').value) return alert('Add a name, room and next due date.');
-    const data = { name, room, every: Math.max(1, parseInt($('e-every').value) || 1), minutes: +$('e-min').value, due: $('e-due').value };
+    const name = $('e-name').value.trim();
+    if (!name || !$('e-due').value) return alert('Add a name and next due date.');
+    const data = { name, room: $('e-room').value, every: Math.max(1, parseInt($('e-every').value) || 1), minutes: +$('e-min').value, due: $('e-due').value };
     if (editing) Object.assign(find(editing), data);
     else state.chores.push({ id: uid(), log: [], order: 1e6, ...data });
-    save(); closeEdit(); render();
+    save(); closeSheet('edit'); render();
   };
   $('e-del').onclick = () => {
     if (!confirm('Delete this chore?')) return;
-    state.chores = state.chores.filter(x => x.id !== editing); save(); closeEdit(); render();
+    state.chores = state.chores.filter(x => x.id !== editing); save(); closeSheet('edit'); render();
   };
 
   // ---- settings: import / export / wipe ----
-  $('s-done').onclick = () => $('settings').classList.remove('open');
+  $('s-done').onclick = () => closeSheet('settings');
   $('s-import').onclick = () => $('s-file').click();
   $('s-file').onchange = async e => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
@@ -369,15 +375,15 @@
       const t = todayStr();
       const from = addDays(t, -((dow(t) - IMPORT_START_WEEKDAY + 7) % 7));   // most recent Wednesday (or today if Wed)
       const chores = (data.chores || []).map((c, i) => {
-        const ch = { id: c.id || uid(), name: String(c.name), room: String(c.room).toLowerCase(), every: Math.max(1, +c.every || 1),
+        const ch = { id: c.id || uid(), name: String(c.name), room: cleanRoom(c.room), every: Math.max(1, +c.every || 1),
           minutes: snapMin(c.minutes), due: c.due || c.start, log: c.log || [], order: c.order ?? i };
         // a fresh chores list (not a backup) is scheduled from `from` onward
         if (!c.due && ch.due < from) ch.due = nextAfter({ ...ch }, addDays(from, -1));
         return ch;
       });
-      if (!chores.length) throw 0;
+      if (!chores.length && !(data.rooms || []).length) throw 0;
       if (state.chores.length && !confirm(`Replace your current ${state.chores.length} chores with ${chores.length} from this file?`)) return;
-      state = { chores }; save(); $('settings').classList.remove('open'); tab = 'today'; render();
+      state = tidy({ rooms: data.rooms || [], chores }); save(); closeSheet('settings'); tab = 'today'; render();
       alert(`Imported ${chores.length} chores.`);
     } catch { alert("That file couldn't be read. Pick the chores .json file or a backup you exported."); }
   };
@@ -389,7 +395,7 @@
   };
   $('s-wipe').onclick = () => {
     if (!confirm('Delete all chores and history from this device?')) return;
-    localStorage.removeItem(KEY); state = { chores: [] }; $('settings').classList.remove('open'); render();
+    localStorage.removeItem(KEY); state = { rooms: [], chores: [] }; closeSheet('settings'); render();
   };
 
   // re-check the date when the app comes back to the front (e.g. the next morning)
